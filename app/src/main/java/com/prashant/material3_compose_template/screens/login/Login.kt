@@ -1,5 +1,7 @@
 package com.prashant.material3_compose_template.screens.login
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -8,13 +10,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -24,6 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.prashant.material3_compose_template.R
@@ -39,97 +47,72 @@ import com.prashant.material3_compose_template.uiconfiguration.UIConfiguration
 fun Login(navHostController: NavHostController, loginVM: LoginVM = hiltViewModel()) {
 
     val mainActivity = (MainActivity.weakReference.get() as MainActivity)
-    val list = arrayListOf(
-        "Akaya Kanadaka",
-        "Akaya Telivigala",
-        "Akronim",
-        "Akshar",
-        "Aladin",
-        "Alata",
-        "Alatsi",
-        "Albert Sans",
-        "Aldrich",
-        "Alef",
-        "Alegreya",
-        "Alegreya SC",
-        "Alegreya Sans",
-        "Alegreya Sans SC",
-        "Aleo",
-        "Alex Brush",
-        "Alexandria",
-        "Alfa Slab One",
-        "Alice",
-        "Alike",
-        "Alike Angular",
-        "Alkalami",
-        "Allan",
-        "Allerta",
-        "Allerta Stencil",
-        "Allison",
-        "Allura",
-        "Almarai",
-        "Almendra",
-        "Almendra Display",
-        "Almendra SC",
-        "Alumni Sans",
-        "Alumni Sans Collegiate One",
-        "Alumni Sans Inline One",
-        "Alumni Sans Pinstripe",
-        "Amarante",
-        "Amaranth",
-        "Amatic SC",
-        "Amethysta",
-        "Amiko",
-        "Amiri",
-        "Amiri Quran",
-        "Amita",
-        "Anaheim",
-        "Andada Pro",
-        "Andika",
-        "Anek Bangla",
-        "Anek Devanagari",
-        "Anek Gujarati",
-        "Anek Gurmukhi",
-        "Anek Kannada",
-        "Anek Latin",
-        "Anek Malayalam",
-        "Anek Odia",
-        "Anek Tamil",
-        "Anek Telugu",
-        "Angkor",
-        "Annie Use Your Telescope",
-        "Anonymous Pro",
-        "Antic",
-        "Antic Didone",
-        "Antic Slab",
-        "Anton",
-        "Antonio",
-        "Anybody",
-        "Arapey",
-        "Arbutus",
-        "Arbutus Slab",
-        "Architects Daughter",
-        "Archivo",
-        "Archivo Black",
-        "Archivo Narrow",
-        "Are You Serious",
-        "Aref Ruqaa",
-        "Aref Ruqaa Ink",
-        "Arima",
-        "Arima Madurai",
-        "Arimo",
-        "Arizonia",
-    )
+    val list = remember {
+        mutableStateListOf<String>()
+    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     val dark = isSystemInDarkTheme()
     var darkTheme by remember {
-        mutableStateOf((loginVM.preferenceFile.retrieveBoolKey(DARK_MODE) ?: dark))
+        mutableStateOf(loginVM.preferenceFile.retrieveBoolKey(DARK_MODE) ?: dark)
     }
     var fontFamily by remember {
         mutableStateOf(loginVM.preferenceFile.retrieveKey(FONT_FAMILY) ?: "Bentham")
     }
+    LaunchedEffect(key1 = lifecycleOwner, block = {
+        lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                super.onStart(owner)
+                list.clear()
+                list.addAll(
+                    arrayListOf(
+                        "Akaya Kanadaka",
+                        "Akaya Telivigala",
+                        "Akronim",
+                        "Akshar",
+                        "Aladin",
+                        "Alata",
+                        "Alatsi",
+                        "Albert Sans",
+                        "Aldrich",
+                        "Alef"
+                    )
+                )
+            }
+
+            override fun onResume(owner: LifecycleOwner) {
+                super.onResume(owner)
+
+                list.clear()
+                list.addAll(
+                    arrayListOf(
+                        "Akaya Kanadaka",
+                        "Akaya Telivigala",
+                        "Akronim",
+                        "Akshar",
+                        "Aladin",
+                        "Alata",
+                        "Alatsi",
+                        "Albert Sans",
+                        "Aldrich",
+                        "Alef"
+                    )
+                )
+            }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+                super.onDestroy(owner)
+                list.clear()
+                Log.e("TAG", "onDestroy: ${list.size}")
+            }
+        })
+    })
+
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -187,10 +170,9 @@ fun Login(navHostController: NavHostController, loginVM: LoginVM = hiltViewModel
 fun LoginPreview() = Login(rememberNavController())
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyUI(
-    listItems: ArrayList<String>,
+    listItems: List<String>,
     currentFontFamily: String,
     selectedFontFamily: (String) -> Unit
 ) {
@@ -198,56 +180,66 @@ fun MyUI(
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(currentFontFamily) }
 
-// We want to react on tap/press on TextField to show menu
-    Column {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded },
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = selectedOptionText,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(45.dp)
+                .border(
+                    width = (1.5).dp,
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = MaterialTheme.shapes.large
+                )
+                .clickable {
+                    Log.e("TAG", "MyUI: $expanded")
+                    expanded = !expanded
+                }/*,
+            trailingIcon = {
+                Icon(imageVector = Icons.Filled.ArrowDropDown.takeIf { !expanded }
+                    ?: Icons.Filled.KeyboardArrowUp, contentDescription = "")
+            }*/
+        )
+
+
+        AnimatedVisibility(
+            visible = expanded/*,
+            enter = fadeIn(animationSpec = tween(durationMillis = 1000)),
+            exit = fadeOut(animationSpec = tween(durationMillis = 1000))*/
         ) {
-            TextField(
-                // The `menuAnchor` modifier must be passed to the text field for correctness.
-                modifier = Modifier.menuAnchor(),
-                readOnly = true,
-                value = selectedOptionText,
-                onValueChange = {},
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-            ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 listItems.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                selectionOption, style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontFamily = FontFamily(
-                                        Font(
-                                            googleFont = GoogleFont(name = selectionOption),
-                                            fontProvider = GoogleFont.Provider(
-                                                providerAuthority = "com.google.android.gms.fonts",
-                                                providerPackage = "com.google.android.gms",
-                                                certificates = R.array.com_google_android_gms_fonts_certs
-                                            )
-                                        )
+                    Text(
+                        selectionOption, style = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = FontFamily(
+                                Font(
+                                    googleFont = GoogleFont(name = selectionOption),
+                                    fontProvider = GoogleFont.Provider(
+                                        providerAuthority = "com.google.android.gms.fonts",
+                                        providerPackage = "com.google.android.gms",
+                                        certificates = R.array.com_google_android_gms_fonts_certs
                                     )
                                 )
                             )
-                        },
-                        onClick = {
-                            selectedOptionText = selectionOption
-                            expanded = false
-                            selectedFontFamily(selectedOptionText)
-                        },
-                        contentPadding = MenuDefaults.DropdownMenuItemContentPadding,
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                selectedOptionText = selectionOption
+                                expanded = false
+                                selectedFontFamily(selectedOptionText)
+                            }
                     )
                 }
             }
-
         }
-
     }
+
 }
 
 @Composable

@@ -105,6 +105,7 @@ class MainActivity : ComponentActivity(), UiConfiguration {
     override fun onDestroy() {
         super.onDestroy()
         weakReference = WeakReference(null)
+        mutableState
     }
 
     override fun onResume() {
