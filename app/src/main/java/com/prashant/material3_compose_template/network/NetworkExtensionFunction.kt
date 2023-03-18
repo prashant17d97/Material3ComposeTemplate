@@ -6,6 +6,7 @@ import android.net.NetworkCapabilities
 import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
+import com.prashant.material3_compose_template.activity.MainActivity
 
 object NetworkExtensionFunction {
     inline fun <reified Generic> jsonElementToData(
@@ -19,9 +20,12 @@ object NetworkExtensionFunction {
         }
     }
 
-    fun showProgress() {}
+    fun showProgress() {
+        (MainActivity.weakReference.get() as MainActivity).showLoader(boolean = true)
+    }
 
     fun hideProgress() {
+        (MainActivity.weakReference.get() as MainActivity).showLoader(boolean = false)
     }
 
 

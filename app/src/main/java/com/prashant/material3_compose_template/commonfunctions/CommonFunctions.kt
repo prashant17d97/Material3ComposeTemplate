@@ -1,7 +1,7 @@
 package com.prashant.material3_compose_template.commonfunctions
 
 import android.widget.Toast
-import com.prashant.material3_compose_template.MainActivity
+import com.prashant.material3_compose_template.activity.MainActivity
 
 object CommonFunctions {
     fun getStringResource(id: Int) =

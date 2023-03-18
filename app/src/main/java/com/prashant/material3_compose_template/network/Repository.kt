@@ -1,7 +1,7 @@
 package com.prashant.material3_compose_template.network
 
 import android.util.Log
-import com.prashant.material3_compose_template.MainActivity
+import com.prashant.material3_compose_template.activity.MainActivity
 import com.prashant.material3_compose_template.R
 import com.prashant.material3_compose_template.commonfunctions.CommonFunctions.getStringResource
 import com.prashant.material3_compose_template.commonfunctions.CommonFunctions.showToast
@@ -21,6 +21,7 @@ class Repository @Inject constructor(
 ) {
     suspend inline fun <reified Generic> apiCall(
         retrofitCall: ApiProcessor,
+        loader: Boolean = false,
         crossinline result: (result: Generic) -> Unit,
         crossinline responseMessage: (message: String, code: Int) -> Unit
     ) {
@@ -29,9 +30,10 @@ class Repository @Inject constructor(
                 getStringResource(R.string.your_device_offline).showToast()
                 return
             } else {
-                showProgress()
-                val response = flow {
+                if (loader)
                     showProgress()
+
+                val response = flow {
                     emit(retrofitCall.sendRequest(retrofitApi))
                 }.flowOn(Dispatchers.IO)
                 response.catch { exception ->

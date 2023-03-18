@@ -26,17 +26,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.prashant.material3_compose_template.MainActivity
 import com.prashant.material3_compose_template.R
+import com.prashant.material3_compose_template.activity.MainActivity
 import com.prashant.material3_compose_template.navigation.LOGIN
+import com.prashant.material3_compose_template.navigation.Screens
+import com.prashant.material3_compose_template.preferencefile.DARK_MODE
+import com.prashant.material3_compose_template.preferencefile.FONT_FAMILY
 import com.prashant.material3_compose_template.uiconfiguration.UIConfiguration
 
 
 @Composable
 fun Login(navHostController: NavHostController, loginVM: LoginVM = hiltViewModel()) {
 
+    val mainActivity = (MainActivity.weakReference.get() as MainActivity)
     val list = arrayListOf(
-
         "Akaya Kanadaka",
         "Akaya Telivigala",
         "Akronim",
@@ -119,11 +122,12 @@ fun Login(navHostController: NavHostController, loginVM: LoginVM = hiltViewModel
     )
     val dark = isSystemInDarkTheme()
     var darkTheme by remember {
-        mutableStateOf(dark)
+        mutableStateOf((loginVM.preferenceFile.retrieveBoolKey(DARK_MODE) ?: dark))
     }
     var fontFamily by remember {
-        mutableStateOf("Bentham")
+        mutableStateOf(loginVM.preferenceFile.retrieveKey(FONT_FAMILY) ?: "Bentham")
     }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
@@ -133,7 +137,7 @@ fun Login(navHostController: NavHostController, loginVM: LoginVM = hiltViewModel
         Icon(imageVector = Icons.Default.Lock,
             contentDescription = LOGIN,
             modifier = Modifier.size(80.dp),
-            tint = Color.Black.takeIf { !darkTheme } ?: Color.White)
+            tint = Color.White.takeIf { darkTheme } ?: Color.Black)
 
         Text(
             text = "$LOGIN Screen", style = MaterialTheme.typography.displayLarge
@@ -141,30 +145,38 @@ fun Login(navHostController: NavHostController, loginVM: LoginVM = hiltViewModel
 
         Spacer(modifier = Modifier.height(20.dp))
         Button(onClick = {
-            loginVM.login(navHostController)
-
+            /**loginVM.login(navHostController)*/
+            navHostController.navigate(Screens.Home.route) {
+                popUpTo(Screens.Login.route) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
         }) {
             Text(
                 text = LOGIN, style = MaterialTheme.typography.displayLarge
             )
         }
-        MyUI(list) {
+        MyUI(list, fontFamily) {
             fontFamily = it
+            mainActivity.changeConfigurationTemporary(fontFamily = it)
         }
 
         ThemeSwitcher(darkTheme = darkTheme) {
             darkTheme = !darkTheme
+            mainActivity.changeConfigurationTemporary(darkTheme = darkTheme)
         }
         Button(onClick = {
-            (MainActivity.weakReference.get() as MainActivity).darkTheme(
-                uiConfiguration = UIConfiguration(
+            loginVM.saveUIConfig(
+                UIConfiguration(
                     isDarkTheme = darkTheme, fontFamily = fontFamily, fontStyle = FontStyle.Normal
 
                 )
             )
+
         }) {
             Text(
-                text = "Save", style = MaterialTheme.typography.bodyMedium
+                text = "Apply the change!", style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -177,10 +189,14 @@ fun LoginPreview() = Login(rememberNavController())
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyUI(listItems: ArrayList<String>, selectedFontFamily: (String) -> Unit) {
+fun MyUI(
+    listItems: ArrayList<String>,
+    currentFontFamily: String,
+    selectedFontFamily: (String) -> Unit
+) {
 
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(listItems[0]) }
+    var selectedOptionText by remember { mutableStateOf(currentFontFamily) }
 
 // We want to react on tap/press on TextField to show menu
     Column {
