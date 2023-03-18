@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Material3ComposeTemplate</string>
+    <string name="someError">Some error occurred!</string>
+    <string name="your_device_offline">You\'re offline</string>
+</resources>
