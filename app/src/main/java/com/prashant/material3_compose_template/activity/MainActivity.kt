@@ -10,27 +10,30 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.SecureFlagPolicy
+import androidx.lifecycle.MutableLiveData
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.prashant.material3_compose_template.datastore.THEME_KEY
 import com.prashant.material3_compose_template.interfaces.UiConfiguration
 import com.prashant.material3_compose_template.navigation.NavGraph
+import com.prashant.material3_compose_template.navigation.Screens
 import com.prashant.material3_compose_template.theme.ComposeTemplateTheme
 import com.prashant.material3_compose_template.uiconfiguration.UIConfiguration
+import com.prashant.material3_compose_template.uimaterials.UIMaterials.Companion.uiMaterials
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
 
@@ -39,6 +42,7 @@ class MainActivity : ComponentActivity(), UiConfiguration {
 
     private var mutableState by mutableStateOf(UIConfiguration())
     private var showLoader by mutableStateOf(false)
+    var currentScreenClick = MutableLiveData(Screens.Home.route)
     private val mainActivityVM by viewModels<MainActivityVM>()
 
     companion object {
@@ -56,12 +60,7 @@ class MainActivity : ComponentActivity(), UiConfiguration {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        NavGraph(navHostController = navHostController)
-                        if (showLoader) {
-                            CircularProgressAnimated()
-                        }
-                    }
+                    MainScreen(navHostController = navHostController)
                 }
             }
 
@@ -73,6 +72,60 @@ class MainActivity : ComponentActivity(), UiConfiguration {
         mainActivityVM.dataStoreUtil.retrieveObject(THEME_KEY, UIConfiguration::class.java) {
             if (it != null) {
                 mutableState = it
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun MainScreen(navHostController: NavHostController) {
+        val navBackStackEntry by navHostController.currentBackStackEntryAsState()
+
+        val showAppBar = when (navBackStackEntry?.destination?.route) {
+            Screens.Splash.route, Screens.Login.route -> false
+            else -> true
+        }
+        Scaffold(
+            topBar = {
+                if (showAppBar) {
+                    TopAppBar(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.primaryContainer),
+                        title = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = navBackStackEntry?.destination?.route ?: "",
+                                    style = MaterialTheme.typography.labelLarge
+                                )
+                                Icon(
+                                    imageVector = Icons.Outlined.Add,
+                                    contentDescription = "Search",
+                                    modifier = Modifier.clickable {
+                                        currentScreenClick.value =
+                                            navBackStackEntry?.destination?.route ?: ""
+                                    })
+                            }
+                        },
+                        scrollBehavior = null
+                    )
+                }
+            }
+        ) {
+            Box(
+                contentAlignment = Alignment.Center, modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+            ) {
+                NavGraph(navHostController = navHostController)
+                if (showLoader) {
+                    CircularProgressAnimated()
+                }
             }
         }
     }
@@ -105,6 +158,7 @@ class MainActivity : ComponentActivity(), UiConfiguration {
     override fun onDestroy() {
         super.onDestroy()
         weakReference = WeakReference(null)
+        uiMaterials = WeakReference(null)
         mutableState
     }
 

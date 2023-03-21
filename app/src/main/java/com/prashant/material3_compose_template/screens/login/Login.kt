@@ -103,7 +103,6 @@ fun Login(navHostController: NavHostController, loginVM: LoginVM = hiltViewModel
             override fun onDestroy(owner: LifecycleOwner) {
                 super.onDestroy(owner)
                 list.clear()
-                Log.e("TAG", "onDestroy: ${list.size}")
             }
         })
     })

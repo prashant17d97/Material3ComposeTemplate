@@ -11,6 +11,7 @@ import com.prashant.material3_compose_template.network.Repository
 import com.prashant.material3_compose_template.network.RetrofitApi
 import com.prashant.material3_compose_template.preferencefile.PreferenceFile
 import com.prashant.material3_compose_template.preferencefile.preferenceName
+import com.prashant.material3_compose_template.roomdb.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -119,6 +120,11 @@ class Module {
     @Provides
     @Singleton
     fun provideRepository(retrofitApi: RetrofitApi): Repository = Repository(retrofitApi)
+
+    @Provides
+    @Singleton
+    fun provideRoomDao(@ApplicationContext context: Context) =
+        AppDatabase.getInstance(context).daoInterface()
 
 
 }

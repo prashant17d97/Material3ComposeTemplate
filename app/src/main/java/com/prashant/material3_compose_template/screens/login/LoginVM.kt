@@ -29,12 +29,13 @@ import javax.inject.Inject
 class LoginVM @Inject constructor(
     val preferenceFile: PreferenceFile,
     private val dataStore: DataStoreUtil,
-    private val repository: Repository,
+    private val repository: Repository
 ) : ViewModel() {
 
     var uiConfiguration: UIConfiguration? = null
 
     init {
+
         dataStore.retrieveObject(THEME_KEY, UIConfiguration::class.java) {
             if (it != null) {
                 uiConfiguration = it
@@ -74,6 +75,7 @@ class LoginVM @Inject constructor(
         preferenceFile.storeKey(FONT_FAMILY, uiConfiguration.fontFamily)
         (MainActivity.weakReference.get() as MainActivity).changeConfiguration()
     }
+
 
 }
 
