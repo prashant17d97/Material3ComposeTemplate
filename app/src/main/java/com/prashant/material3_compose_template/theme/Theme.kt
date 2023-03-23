@@ -2,7 +2,6 @@ package com.prashant.material3_compose_template.theme
 
 import android.app.Activity
 import android.os.Build
-import android.util.Log
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -11,7 +10,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.prashant.material3_compose_template.uiconfiguration.UIConfiguration
+import com.prashant.material3_compose_template.themeproperties.ThemeProperties
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -44,7 +43,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun ComposeTemplateTheme(
-    uiConfiguration: UIConfiguration,
+    themeProperties: ThemeProperties,
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -52,12 +51,12 @@ fun ComposeTemplateTheme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (uiConfiguration.isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
+            if (themeProperties.isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
                 context
             )
 
         }
-        uiConfiguration.isDarkTheme -> {
+        themeProperties.isDarkTheme -> {
             DarkColorScheme
         }
         else -> {
@@ -76,14 +75,14 @@ fun ComposeTemplateTheme(
             currentWindow.statusBarColor = colorScheme.primary.toArgb()
             /* accessing the insets controller to change appearance of the status bar, with 100% less deprecation warnings */
             WindowCompat.getInsetsController(currentWindow, view).isAppearanceLightStatusBars =
-                uiConfiguration.isDarkTheme
+                themeProperties.isDarkTheme
         }
     }
 
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Type(fontFamilyName = uiConfiguration.fontFamily).Typography(uiConfiguration.fontStyle),
+        typography = Type(fontFamilyName = themeProperties.fontFamily).Typography(themeProperties.fontStyle),
         shapes = Shapes,
         content = content
     )

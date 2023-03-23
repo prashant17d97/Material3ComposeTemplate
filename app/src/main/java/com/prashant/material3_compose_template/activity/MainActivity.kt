@@ -32,7 +32,7 @@ import com.prashant.material3_compose_template.interfaces.UiConfiguration
 import com.prashant.material3_compose_template.navigation.NavGraph
 import com.prashant.material3_compose_template.navigation.Screens
 import com.prashant.material3_compose_template.theme.ComposeTemplateTheme
-import com.prashant.material3_compose_template.uiconfiguration.UIConfiguration
+import com.prashant.material3_compose_template.themeproperties.ThemeProperties
 import com.prashant.material3_compose_template.uimaterials.UIMaterials.Companion.uiMaterials
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
@@ -40,22 +40,25 @@ import java.lang.ref.WeakReference
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(), UiConfiguration {
 
-    private var mutableState by mutableStateOf(UIConfiguration())
+    private var mutableState by mutableStateOf(ThemeProperties())
     private var showLoader by mutableStateOf(false)
-    var currentScreenClick = MutableLiveData(Screens.Home.route)
+    var currentScreenClick = MutableLiveData("")
     private val mainActivityVM by viewModels<MainActivityVM>()
 
     companion object {
         lateinit var weakReference: WeakReference<Context>
+        var mainActivity: MainActivity? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         weakReference = WeakReference(this)
+        mainActivity = weakReference.get() as? MainActivity
+
         setContent {
             val navHostController = rememberNavController()
 
-            ComposeTemplateTheme(uiConfiguration = mutableState) {
+            ComposeTemplateTheme(themeProperties = mutableState) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
@@ -69,7 +72,7 @@ class MainActivity : ComponentActivity(), UiConfiguration {
 
     override fun onStart() {
         super.onStart()
-        mainActivityVM.dataStoreUtil.retrieveObject(THEME_KEY, UIConfiguration::class.java) {
+        mainActivityVM.dataStoreUtil.retrieveObject(THEME_KEY, ThemeProperties::class.java) {
             if (it != null) {
                 mutableState = it
             }
@@ -81,7 +84,7 @@ class MainActivity : ComponentActivity(), UiConfiguration {
     fun MainScreen(navHostController: NavHostController) {
         val navBackStackEntry by navHostController.currentBackStackEntryAsState()
 
-        val showAppBar = when (navBackStackEntry?.destination?.route) {
+        val showAppBar: Boolean = when (navBackStackEntry?.destination?.route) {
             Screens.Splash.route, Screens.Login.route -> false
             else -> true
         }
@@ -109,6 +112,7 @@ class MainActivity : ComponentActivity(), UiConfiguration {
                                     modifier = Modifier.clickable {
                                         currentScreenClick.value =
                                             navBackStackEntry?.destination?.route ?: ""
+
                                     })
                             }
                         },
@@ -156,36 +160,37 @@ class MainActivity : ComponentActivity(), UiConfiguration {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         weakReference = WeakReference(null)
+        mainActivity = null
         uiMaterials = WeakReference(null)
         mutableState
+        super.onDestroy()
     }
 
     override fun onResume() {
         super.onResume()
         weakReference = WeakReference(this)
-        mainActivityVM.dataStoreUtil.retrieveObject(THEME_KEY, UIConfiguration::class.java) {
+        mainActivityVM.dataStoreUtil.retrieveObject(THEME_KEY, ThemeProperties::class.java) {
             if (it != null) {
                 mutableState = it
             }
         }
     }
 
-    override fun changeConfiguration() {
+    override fun uiConfiguration() {
         Log.e("TAG", "changeConfiguration: ")
-        mainActivityVM.dataStoreUtil.retrieveObject(THEME_KEY, UIConfiguration::class.java) {
+        mainActivityVM.dataStoreUtil.retrieveObject(THEME_KEY, ThemeProperties::class.java) {
             if (it != null) {
                 mutableState = it
             }
         }
     }
 
-    override fun changeConfigurationTemporary(
+    override fun uiConfigurationTemporary(
         darkTheme: Boolean?, fontFamily: String, fontStyle: FontStyle
     ) {
-        mutableState = mutableState.copy(isDarkTheme = darkTheme.takeIf { it != null }
-            ?: mutableState.isDarkTheme,
+        mutableState = mutableState.copy(
+            isDarkTheme = darkTheme.takeIf { it != null } ?: mutableState.isDarkTheme,
             fontFamily = fontFamily.takeIf { it.isNotEmpty() } ?: mutableState.fontFamily,
             fontStyle = fontStyle)
     }

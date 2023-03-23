@@ -19,7 +19,7 @@ import com.prashant.material3_compose_template.preferencefile.DARK_MODE
 import com.prashant.material3_compose_template.preferencefile.FONT_FAMILY
 import com.prashant.material3_compose_template.preferencefile.PreferenceFile
 import com.prashant.material3_compose_template.screens.login.data.LoginData
-import com.prashant.material3_compose_template.uiconfiguration.UIConfiguration
+import com.prashant.material3_compose_template.themeproperties.ThemeProperties
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -32,11 +32,11 @@ class LoginVM @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    var uiConfiguration: UIConfiguration? = null
+    var uiConfiguration: ThemeProperties? = null
 
     init {
 
-        dataStore.retrieveObject(THEME_KEY, UIConfiguration::class.java) {
+        dataStore.retrieveObject(THEME_KEY, ThemeProperties::class.java) {
             if (it != null) {
                 uiConfiguration = it
             }
@@ -68,12 +68,12 @@ class LoginVM @Inject constructor(
             })
     }
 
-    fun saveUIConfig(uiConfiguration: UIConfiguration) {
+    fun saveUIConfig(uiConfiguration: ThemeProperties) {
         Log.e(TAG, "saveUIConfig: $uiConfiguration")
         dataStore.saveObject(THEME_KEY, uiConfiguration)
         preferenceFile.storeBoolKey(DARK_MODE, uiConfiguration.isDarkTheme)
         preferenceFile.storeKey(FONT_FAMILY, uiConfiguration.fontFamily)
-        (MainActivity.weakReference.get() as MainActivity).changeConfiguration()
+        (MainActivity.weakReference.get() as MainActivity).uiConfiguration()
     }
 
 

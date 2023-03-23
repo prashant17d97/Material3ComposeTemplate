@@ -5,8 +5,8 @@ import androidx.compose.ui.text.font.FontStyle.Companion.Normal
 
 
 interface UiConfiguration {
-    fun changeConfiguration()
-    fun changeConfigurationTemporary(
+    fun uiConfiguration()
+    fun uiConfigurationTemporary(
         darkTheme: Boolean?=null,
         fontFamily: String="",
         fontStyle: FontStyle = Normal

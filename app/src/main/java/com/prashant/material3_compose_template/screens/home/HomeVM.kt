@@ -42,7 +42,7 @@ class HomeVM @Inject constructor(
         data = daoInterface.getAll()
     }
 
-    private fun getAllUser() = viewModelScope.launch {
+    fun getAllUser() = viewModelScope.launch {
         data = daoInterface.getAll()
     }
 
@@ -76,5 +76,21 @@ class HomeVM @Inject constructor(
 
     companion object {
         const val TAG = "HomeVM"
+    }
+
+
+    override fun onCleared() {
+        super.onCleared()
+        data = listOf()
+        user = User(id = 0, name = "", email = "")
+        userByName = User(id = 0, name = "", email = "")
+        userByNameList = listOf()
+    }
+
+    fun clearData(){
+        data = listOf()
+        user = User(id = 0, name = "", email = "")
+        userByName = User(id = 0, name = "", email = "")
+        userByNameList = listOf()
     }
 }

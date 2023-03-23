@@ -40,7 +40,7 @@ import com.prashant.material3_compose_template.navigation.LOGIN
 import com.prashant.material3_compose_template.navigation.Screens
 import com.prashant.material3_compose_template.preferencefile.DARK_MODE
 import com.prashant.material3_compose_template.preferencefile.FONT_FAMILY
-import com.prashant.material3_compose_template.uiconfiguration.UIConfiguration
+import com.prashant.material3_compose_template.themeproperties.ThemeProperties
 
 
 @Composable
@@ -141,16 +141,16 @@ fun Login(navHostController: NavHostController, loginVM: LoginVM = hiltViewModel
         }
         MyUI(list, fontFamily) {
             fontFamily = it
-            mainActivity.changeConfigurationTemporary(fontFamily = it)
+            mainActivity.uiConfigurationTemporary(fontFamily = it)
         }
 
         ThemeSwitcher(darkTheme = darkTheme) {
             darkTheme = !darkTheme
-            mainActivity.changeConfigurationTemporary(darkTheme = darkTheme)
+            mainActivity.uiConfigurationTemporary(darkTheme = darkTheme)
         }
         Button(onClick = {
             loginVM.saveUIConfig(
-                UIConfiguration(
+                ThemeProperties(
                     isDarkTheme = darkTheme, fontFamily = fontFamily, fontStyle = FontStyle.Normal
 
                 )
