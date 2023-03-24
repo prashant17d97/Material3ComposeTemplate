@@ -1,11 +1,13 @@
 package com.prashant.material3_compose_template.screens.home
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prashant.material3_compose_template.backup.AppBackupAgent
 import com.prashant.material3_compose_template.datastore.DataStoreUtil
 import com.prashant.material3_compose_template.network.RetrofitApi
 import com.prashant.material3_compose_template.preferencefile.PreferenceFile
@@ -22,6 +24,7 @@ class HomeVM @Inject constructor(
     private val retrofitApi: RetrofitApi,
     private val daoInterface: DaoInterface
 ) : ViewModel() {
+
 
     var data by mutableStateOf(listOf<User>())
     var user by mutableStateOf(User(id = 0, name = "", email = ""))
@@ -81,13 +84,10 @@ class HomeVM @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        data = listOf()
-        user = User(id = 0, name = "", email = "")
-        userByName = User(id = 0, name = "", email = "")
-        userByNameList = listOf()
+        clearData()
     }
 
-    fun clearData(){
+    fun clearData() {
         data = listOf()
         user = User(id = 0, name = "", email = "")
         userByName = User(id = 0, name = "", email = "")

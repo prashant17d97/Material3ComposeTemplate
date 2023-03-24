@@ -10,14 +10,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -39,7 +37,8 @@ const val TAG = "HomeCompose"
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Home(
-    navHostController: NavHostController, homeVM: HomeVM = hiltViewModel()
+    navHostController: NavHostController,
+    homeVM: HomeVM = hiltViewModel()
 ) {
     var id by remember {
         mutableStateOf("")
@@ -48,12 +47,13 @@ fun Home(
         mutableStateOf(false)
     }
 
+    val context = LocalContext.current
     val lifeCycleOwner = LocalLifecycleOwner.current
 
     mainActivity?.currentScreenClick?.observe(lifeCycleOwner) { currentCall ->
         when (currentCall) {
             Screens.Home.route -> {
-                dismiss = true
+                dismiss=true
             }
         }
     }
@@ -99,7 +99,6 @@ fun Home(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-
         Row(
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -146,4 +145,5 @@ fun Home(
             ui.UserCard(user = user, delete = { homeVM.deleteData(user) })
         }
     }
+
 }
